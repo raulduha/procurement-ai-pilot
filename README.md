@@ -50,6 +50,41 @@ En PowerShell usa esto en vez de `cp`:
 Copy-Item .env.example .env.local
 ```
 
+## Prompt listo para Claude
+
+Cuando tu primo abra este proyecto en Claude Code, debe copiar y pegar **todo** este texto. Claude hará la configuración técnica y se detendrá solo cuando el dueño tenga que iniciar sesión, aprobar una cuenta o ingresar una clave.
+
+```text
+Trabaja únicamente en la rama development de este repositorio. Lee completamente README.md, AGENTS.md y vendor/upstream/SOURCES.md antes de actuar.
+
+Objetivo: dejar operativo Procurement AI Pilot como piloto privado para una sola persona, sin Microsoft SharePoint/OneDrive por ahora.
+
+Reglas obligatorias:
+- No modifiques, resumas, muevas ni reescribas nada dentro de vendor/upstream/.
+- No inventes skills ni presentes capacidades propias como si fueran upstream.
+- No subas .env.local, claves, tokens, documentos empresariales, node_modules ni caches a Git.
+- No hagas merge a main, no fuerces pushes y no despliegues Vercel sin pedir confirmación explícita al dueño.
+- No pidas ni muestres claves en el chat. Si una clave debe ingresarse, indica exactamente dónde debe ingresarla el dueño (Supabase, Anthropic o Vercel).
+- Microsoft es opcional: no lo configures ni solicites permisos de Microsoft Graph en esta etapa.
+- No cargues documentos corporativos durante las pruebas; usa solo archivos de prueba aprobados.
+
+Flujo de trabajo:
+1. Ejecuta npm install, npm run typecheck, npm run lint y npm run build. Informa cualquier fallo antes de cambiar código.
+2. Revisa que .env.local esté ignorado por Git. Si no existe, crea una copia local desde .env.example, sin valores secretos.
+3. Guía al dueño para crear un proyecto Supabase. Cuando esté creado, indícale que ejecute el contenido completo de supabase/migrations/20260827_private_pilot.sql en Supabase SQL Editor.
+4. Guía al dueño para habilitar Email/Magic Link en Supabase y configurar las Redirect URLs local y de Vercel terminadas en /auth/callback.
+5. Pide al dueño que ingrese directamente, sin mostrarlas en la conversación, estas variables en .env.local y luego en Vercel:
+   ALLOWED_USER_EMAIL
+   ANTHROPIC_API_KEY
+   ANTHROPIC_MODEL=claude-sonnet-4-5
+   NEXT_PUBLIC_SUPABASE_URL
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+6. Prueba localmente el login con el correo autorizado, una carga de PDF de prueba y una consulta sencilla a Claude. Confirma que una ejecución quede registrada en Supabase y que los documentos sean privados.
+7. Explica el resultado en lenguaje simple. Deja cualquier corrección en development, ejecuta nuevamente typecheck, lint y build y prepara un commit pequeño y claro. Espera a que el dueño haga el merge.
+
+Considera el piloto listo solo cuando: el login funciona, el correo no autorizado queda bloqueado, un PDF de prueba se procesa tras iniciar sesión, Claude responde usando una skill original y Supabase almacena el resultado con RLS.
+```
+
 ## Supabase: paso a paso
 
 Supabase es obligatorio para iniciar sesión, procesar PDFs, guardar archivos privados y usar Claude de forma segura.
