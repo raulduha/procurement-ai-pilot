@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
+import { requirePilotUser } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 const MAX_BYTES = 20 * 1024 * 1024;
 
 export async function POST(request: Request) {
   try {
+    await requirePilotUser();
     const form = await request.formData();
     const file = form.get("file");
     if (!(file instanceof File) || !file.name.toLowerCase().endsWith(".pdf")) return NextResponse.json({ error: "Selecciona un PDF válido." }, { status: 400 });
@@ -24,6 +26,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ pageCount: pages.length, characters: text.length, text: text.slice(0, 120_000), truncated: text.length > 120_000 });
   } catch (error) {
     console.error("PDF processing failed", error);
-    return NextResponse.json({ error: "No fue posible extraer texto de este PDF. Puede estar dañado, protegido o ser una imagen escaneada." }, { status: 422 });
+    const message = error instanceof Error ? error.message : "No fue posible extraer texto de este PDF. Puede estar dañado, protegido o ser una imagen escaneada.";
+    const status = message.includes("Supabase") ? 503 : message.includes("iniciar sesión") || message.includes("autorizada") ? 401 : 422;
+    return NextResponse.json({ error: message }, { status });
   }
 }
