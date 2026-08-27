@@ -1,74 +1,203 @@
 # Procurement AI Pilot
 
-Piloto privado para analizar información de compras desde Excel y PDF, ejecutar workflows de procurement y preparar una conexión limitada con SharePoint/OneDrive.
+Aplicación privada para analizar Excel, CSV y PDF de compras, revisar gasto y solicitar análisis a Claude usando las skills de procurement originales que incluye este repositorio.
 
-> ¿No programas ni usas agentes? Empieza por [la guía simple de puesta en marcha](docs/GUIA-PARA-PRIMO.md). Explica cada cuenta, clave y prueba en orden.
+No necesitas saber de agentes ni programación. Sigue esta guía en orden y no cargues documentos empresariales hasta completar Supabase y el acceso privado.
 
-El proyecto usa como fuente canónica las skills originales de:
+## Qué hace
 
-- [Procurement AI Assistant](https://github.com/arunbalajiraju-proc/procurement-ai-assistant)
-- [Procurement Skills for Claude](https://github.com/Maxbase91/procurement-skills)
+- Lee Excel, CSV y PDF cargados por la persona usuaria.
+- Detecta monto, proveedor, categoría y fecha para mostrar métricas de gasto.
+- Extrae texto real de PDFs en el servidor.
+- Ejecuta la skill original apropiada mediante Claude API.
+- Guarda documentos y ejecuciones de skills en Supabase, con reglas RLS.
+- Nunca adjudica compras, firma contratos, contacta proveedores ni toma decisiones automáticamente: una persona debe revisar toda recomendación.
 
-Los archivos originales están en `vendor/upstream/`, conservan sus licencias MIT y no deben modificarse. Las versiones exactas están registradas en `vendor/upstream/SOURCES.md`.
+**Microsoft SharePoint/OneDrive es opcional.** La aplicación funciona con carga manual de Excel, CSV y PDF; déjalo para después.
 
-## Estado actual
+## Antes de usar información real
 
-- Dashboard privado en Next.js.
-- Carga local de XLSX, XLS y CSV.
-- Detección de columnas de monto, proveedor, categoría y fecha.
-- Métricas y gráficos calculados únicamente desde los datos cargados.
-- Procesamiento real de PDF en servidor con extracción de texto.
-- Biblioteca visible de skills originales.
-- Ejecución de skills mediante Claude API con el `SKILL.md` original cargado sin modificaciones.
-- Inicio de sesión de Supabase, tablas, Storage privado y políticas RLS en una migración.
-- Microsoft Graph de solo lectura limitado a una carpeta explícitamente autorizada.
-- Configuración de seguridad para Vercel y ejemplo de variables de entorno.
+Completa primero estas tres configuraciones:
 
-La conexión productiva con Claude, Supabase y Microsoft 365 requiere credenciales del propietario y autorización de la empresa. Ninguna clave debe enviarse a la persona usuaria.
+1. Supabase: cuentas y documentos privados.
+2. Anthropic: clave para Claude.
+3. Vercel o el computador local: variables de configuración.
 
-## Puesta en marcha para una persona no técnica
+Sin ellas puedes conocer la interfaz y analizar Excel localmente. No subas PDFs ni documentos corporativos al sitio publicado hasta que Supabase esté configurado.
 
-En Windows, haz doble clic en `INICIAR-LOCALMENTE.cmd`. La primera vez crea `.env.local` sin claves y abre la aplicación cuando terminen de instalarse las dependencias. Después sigue [la guía simple](docs/GUIA-PARA-PRIMO.md) para conectar Supabase, Claude y, si está autorizado, SharePoint.
+## Inicio rápido local
 
-## Requisitos
+### Windows
 
-- Node.js 22 o superior.
-- npm.
-- Git.
+1. Instala [Node.js 22 o superior](https://nodejs.org/).
+2. Descarga o clona el repositorio.
+3. Haz doble clic en `INICIAR-LOCALMENTE.cmd`.
+4. Abre `http://localhost:3000`.
 
-En Windows se recomienda PowerShell 7 y VS Code.
+El primer inicio crea `.env.local`. Es privado: nunca lo subas a GitHub.
 
-## Ejecutar localmente
+### macOS, Linux o PowerShell
 
 ```bash
-git clone https://github.com/raulduha/procurement-ai-pilot.git
-cd procurement-ai-pilot
 npm install
-copy .env.example .env.local
+cp .env.example .env.local
 npm run dev
 ```
 
-En macOS o Linux reemplaza `copy` por:
+En PowerShell usa esto en vez de `cp`:
 
-```bash
-cp .env.example .env.local
+```powershell
+Copy-Item .env.example .env.local
 ```
 
-Abre [http://localhost:3000](http://localhost:3000).
+## Prompt listo para Claude
 
-Para ejecutar una versión de producción:
+Cuando tu primo abra este proyecto en Claude Code, debe copiar y pegar **todo** este texto. Claude hará la configuración técnica y se detendrá solo cuando el dueño tenga que iniciar sesión, aprobar una cuenta o ingresar una clave.
 
-```bash
-npm run build
-npm run start
+```text
+Trabaja únicamente en la rama development de este repositorio. Lee completamente README.md, AGENTS.md y vendor/upstream/SOURCES.md antes de actuar.
+
+Objetivo: dejar operativo Procurement AI Pilot como piloto privado para una sola persona, sin Microsoft SharePoint/OneDrive por ahora.
+
+Reglas obligatorias:
+- No modifiques, resumas, muevas ni reescribas nada dentro de vendor/upstream/.
+- No inventes skills ni presentes capacidades propias como si fueran upstream.
+- No subas .env.local, claves, tokens, documentos empresariales, node_modules ni caches a Git.
+- No hagas merge a main, no fuerces pushes y no despliegues Vercel sin pedir confirmación explícita al dueño.
+- No pidas ni muestres claves en el chat. Si una clave debe ingresarse, indica exactamente dónde debe ingresarla el dueño (Supabase, Anthropic o Vercel).
+- Microsoft es opcional: no lo configures ni solicites permisos de Microsoft Graph en esta etapa.
+- No cargues documentos corporativos durante las pruebas; usa solo archivos de prueba aprobados.
+
+Flujo de trabajo:
+1. Ejecuta npm install, npm run typecheck, npm run lint y npm run build. Informa cualquier fallo antes de cambiar código.
+2. Revisa que .env.local esté ignorado por Git. Si no existe, crea una copia local desde .env.example, sin valores secretos.
+3. Guía al dueño para crear un proyecto Supabase. Cuando esté creado, indícale que ejecute el contenido completo de supabase/migrations/20260827_private_pilot.sql en Supabase SQL Editor.
+4. Guía al dueño para habilitar Email/Magic Link en Supabase y configurar las Redirect URLs local y de Vercel terminadas en /auth/callback.
+5. Pide al dueño que ingrese directamente, sin mostrarlas en la conversación, estas variables en .env.local y luego en Vercel:
+   ALLOWED_USER_EMAIL
+   ANTHROPIC_API_KEY
+   ANTHROPIC_MODEL=claude-sonnet-4-5
+   NEXT_PUBLIC_SUPABASE_URL
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+6. Prueba localmente el login con el correo autorizado, una carga de PDF de prueba y una consulta sencilla a Claude. Confirma que una ejecución quede registrada en Supabase y que los documentos sean privados.
+7. Explica el resultado en lenguaje simple. Deja cualquier corrección en development, ejecuta nuevamente typecheck, lint y build y prepara un commit pequeño y claro. Espera a que el dueño haga el merge.
+
+Considera el piloto listo solo cuando: el login funciona, el correo no autorizado queda bloqueado, un PDF de prueba se procesa tras iniciar sesión, Claude responde usando una skill original y Supabase almacena el resultado con RLS.
 ```
 
-## Trabajar con Codex
+## Supabase: paso a paso
 
-1. Clona y abre el repositorio en VS Code.
-2. Inicia Codex dentro de la carpeta del proyecto.
-3. Pídele que lea primero `AGENTS.md`.
-4. Trabaja en una rama y ejecuta:
+Supabase es obligatorio para iniciar sesión, procesar PDFs, guardar archivos privados y usar Claude de forma segura.
+
+1. Entra a [supabase.com](https://supabase.com/) y crea una cuenta con correo de la empresa.
+2. Pulsa **New project**, nómbralo `procurement-ai-pilot` y guarda la contraseña de base de datos en el gestor de contraseñas de la empresa.
+3. Cuando el proyecto esté listo, abre **SQL Editor → New query**.
+4. Abre localmente `supabase/migrations/20260827_private_pilot.sql`, copia todo su contenido en el editor y pulsa **Run**.
+   - Crea las tablas, el bucket privado `documents` y las reglas RLS.
+5. Abre **Authentication → Providers → Email** y habilita Email / Magic Link.
+6. En **Authentication → URL Configuration**, configura:
+   - **Site URL**: tu URL final de Vercel, por ejemplo `https://procurement-ai-pilot.vercel.app`.
+   - **Redirect URLs**: `http://localhost:3000/auth/callback` y `https://TU-URL-DE-VERCEL/auth/callback`.
+7. En **Project Settings → API**, copia:
+   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`.
+   - **Publishable key** → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
+
+La Publishable key puede estar en la web porque RLS protege los datos. La clave secreta de Supabase no es necesaria para la versión actual del piloto.
+
+## Claude: paso a paso
+
+1. Entra a la consola de Anthropic con una cuenta autorizada por la empresa.
+2. Crea una API key para este piloto.
+3. Guárdala solo en Vercel y/o `.env.local`.
+4. Nunca la pegues en GitHub, documentos compartidos ni conversaciones.
+
+Usa `claude-sonnet-4-5` en `ANTHROPIC_MODEL`, salvo que la empresa apruebe otro modelo.
+
+## Variables de configuración
+
+Completa `.env.local` para trabajar localmente y agrega las mismas variables en **Vercel → Project → Settings → Environment Variables** para producción.
+
+| Variable | Valor | ¿Secreta? |
+| --- | --- | --- |
+| `ALLOWED_USER_EMAIL` | Único correo autorizado para el piloto | No, pero privada |
+| `ANTHROPIC_API_KEY` | API key de Anthropic | Sí |
+| `ANTHROPIC_MODEL` | `claude-sonnet-4-5` | No |
+| `NEXT_PUBLIC_SUPABASE_URL` | Project URL de Supabase | No |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable key de Supabase | No |
+
+No necesitas `SUPABASE_SECRET_KEY` por ahora. Después de agregar las variables, reinicia `npm run dev` localmente o redepliega desde `main` en Vercel.
+
+## Usar la aplicación
+
+1. Abre `/login` e ingresa el correo definido en `ALLOWED_USER_EMAIL`.
+2. Revisa el enlace mágico que envía Supabase.
+3. Carga primero un archivo de prueba no confidencial.
+4. En **Documentos**, revisa que un PDF aparezca como texto extraído.
+5. En **Asistente**, escribe una pregunta concreta.
+6. Revisa siempre la respuesta antes de usarla en una compra, contrato, proveedor o negociación.
+
+Ejemplo: “Resume los riesgos contractuales de este PDF y señala qué debe revisar una persona responsable.”
+
+## Desplegar en Vercel
+
+1. Revisa y fusiona `development` a `main`.
+2. En Vercel importa el repositorio privado `raulduha/procurement-ai-pilot`.
+3. Vercel detecta Next.js automáticamente.
+4. Agrega las cinco variables de la tabla anterior en Production y Preview.
+5. Pulsa **Deploy**.
+6. Copia la URL publicada y agrégala a las Redirect URLs de Supabase.
+7. Prueba iniciar sesión antes de usar documentos reales.
+
+Si tu equipo restringe despliegues o integraciones de terceros, deja que el dueño del proyecto haga ese paso manualmente. No amplíes permisos de Vercel o GitHub por comodidad.
+
+## Microsoft: dejar para después
+
+**No es necesario ahora.** La carga manual de Excel, CSV y PDF cubre el uso inicial del piloto.
+
+Solo conecta SharePoint/OneDrive cuando la empresa lo apruebe. Un administrador de Microsoft 365 debe crear una aplicación de Entra ID con permisos mínimos (`Sites.Selected`) y autorizar solamente una carpeta. Entonces agrega:
+
+```text
+MICROSOFT_TENANT_ID=
+MICROSOFT_CLIENT_ID=
+MICROSOFT_CLIENT_SECRET=
+MICROSOFT_SHAREPOINT_SITE_ID=
+MICROSOFT_SHAREPOINT_DRIVE_ID=
+MICROSOFT_SHAREPOINT_FOLDER_ID=
+```
+
+`MICROSOFT_CLIENT_SECRET` es secreto. La integración es solo de lectura y solo enumera la carpeta configurada.
+
+## Cómo funciona por dentro
+
+No hay un servidor separado que instalar:
+
+- **Frontend y backend:** Next.js.
+- **Backend:** rutas internas para PDF, Claude, documentos y Microsoft Graph.
+- **Usuarios, base de datos y archivos:** Supabase con RLS.
+- **IA:** Claude API desde el servidor; la clave no llega al navegador.
+- **Despliegue:** Vercel.
+
+## Skills originales y licencias
+
+Las skills canónicas están en `vendor/upstream/` y no se modifican:
+
+- `arunbalajiraju-proc/procurement-ai-assistant` — commit `67b7e02bfb613f9939f3d7347d75100954d3bc03`.
+- `Maxbase91/procurement-skills` — commit `f1f1cbb136ade6bd15e6bcf21fdf254963c18689`.
+
+Las licencias MIT originales se mantienen junto con los archivos. La aplicación carga el `SKILL.md` original al ejecutar Claude, sin reescribir su lógica.
+
+## Seguridad
+
+- Nunca subas `.env.local`, API keys, tokens o documentos empresariales a GitHub.
+- Mantén el repositorio privado.
+- Prueba primero con datos no confidenciales.
+- Usa un único correo autorizado mientras el piloto sea pequeño.
+- Microsoft debe tener acceso a una carpeta, no a toda la organización.
+- Toda recomendación requiere revisión humana.
+
+## Verificar cambios técnicos
+
+Antes de fusionar código ejecuta:
 
 ```bash
 npm run typecheck
@@ -76,87 +205,14 @@ npm run lint
 npm run build
 ```
 
-Ejemplo de instrucción:
+## Problemas comunes
 
-> Lee AGENTS.md y vendor/upstream/SOURCES.md. Implementa el cambio sin modificar las skills originales. Ejecuta typecheck, lint y build.
+| Problema | Solución |
+| --- | --- |
+| “Supabase no está configurado” | Revisa `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`; luego reinicia o redepliega. |
+| No llega el enlace de acceso | Revisa Email/Magic Link y las Redirect URLs en Supabase. |
+| “Claude API no está configurada” | Agrega `ANTHROPIC_API_KEY` solo en Vercel o `.env.local`. |
+| No puedo usar un PDF | Inicia sesión primero; solo usuarios autorizados pueden procesarlo. |
+| SharePoint no funciona | Déjalo desactivado hasta tener los permisos y los seis valores configurados. |
 
-## Trabajar con Claude Code
-
-```bash
-claude
-```
-
-Prompt inicial recomendado:
-
-> Lee completamente AGENTS.md. Usa las skills originales de vendor/upstream como fuente canónica y no reescribas su lógica. Revisa el estado del proyecto y ejecuta las verificaciones antes de proponer cambios.
-
-Claude Code trabaja sobre el mismo repositorio y sus cambios pueden desplegarse desde GitHub.
-
-## Usar las skills en Claude Desktop
-
-La aplicación web y las skills son dos superficies diferentes. Claude Desktop no levanta el dashboard: puede recibir las skills originales como paquetes ZIP.
-
-En Windows:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\package-skills.ps1
-```
-
-En macOS, Linux o WSL:
-
-```bash
-bash scripts/package-skills.sh
-```
-
-Los ZIP se crean en `dist/skills/`. En Claude, abre **Settings → Capabilities → Skills → Upload skill** y carga solo las skills que necesites. La disponibilidad depende del plan y de los controles de la organización.
-
-## Usar las skills en ChatGPT
-
-En un espacio de ChatGPT con soporte para Skills:
-
-1. Genera los ZIP con uno de los scripts anteriores.
-2. Abre la administración de Skills.
-3. Sube la skill principal de Procurement AI Assistant.
-4. Agrega únicamente las skills especializadas necesarias.
-
-Si tu cuenta no permite instalar Skills, usa el dashboard local o desplegado; no copies secretos ni documentos empresariales a una conversación no aprobada.
-
-## Variables de entorno
-
-Copia `.env.example` a `.env.local`.
-
-| Variable | Uso |
-|---|---|
-| `ALLOWED_USER_EMAIL` | Correo único autorizado para el piloto |
-| `ANTHROPIC_API_KEY` | Clave de Claude guardada solo en servidor |
-| `ANTHROPIC_MODEL` | Modelo aprobado para el piloto |
-| `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Clave pública protegida por RLS |
-| `SUPABASE_SECRET_KEY` | Clave exclusiva del backend |
-| `MICROSOFT_TENANT_ID` | Tenant de Microsoft Entra |
-| `MICROSOFT_CLIENT_ID` | Identificador de la aplicación |
-| `MICROSOFT_CLIENT_SECRET` | Secreto guardado solo en servidor |
-
-## Despliegue en Vercel
-
-1. Importa este repositorio privado en Vercel.
-2. Mantén Next.js como framework detectado.
-3. Agrega las variables de `.env.example` en **Project Settings → Environment Variables**.
-4. Despliega primero sin documentos corporativos.
-5. Verifica autenticación, RLS y permisos antes de cargar información real.
-
-Cada cambio fusionado a `main` actualiza producción. Las ramas y pull requests generan previews independientes.
-
-## Seguridad
-
-- Repositorio privado.
-- Archivos y tablas privadas.
-- RLS habilitado en todas las tablas de Supabase.
-- Claves secretas únicamente en backend.
-- Microsoft Graph con permisos seleccionados para el sitio o carpeta autorizada.
-- Revisión humana obligatoria antes de usar recomendaciones de contratos, proveedores, negociación o adjudicación.
-- No cargar información confidencial hasta obtener aprobación formal de seguridad y tratamiento de datos.
-
-## Licencias
-
-Las skills vendorizadas mantienen sus archivos de licencia originales. El código de integración del piloto debe conservar este aviso y no atribuirse la autoría de las skills upstream.
+Para una guía más visual, revisa `docs/GUIA-PARA-PRIMO.md`.
