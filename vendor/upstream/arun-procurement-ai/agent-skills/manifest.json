@@ -1,0 +1,62 @@
+[
+  {
+    "name": "procurement-skill",
+    "description": "Applies procurement context, guardrails, risk checks, and human decision boundaries. Use for general procurement work or tasks spanning multiple sourcing workflows.",
+    "package": "packages/procurement-skill.zip",
+    "source": "agent-skills/procurement-skill/SKILL.md"
+  },
+  {
+    "name": "procurement-intake-skill",
+    "description": "Reviews procurement intake requests, identifies missing information and risks, and prepares stakeholder questions. Use at the start of a sourcing or renewal request.",
+    "package": "packages/procurement-intake-skill.zip",
+    "source": "agent-skills/procurement-intake-skill/SKILL.md"
+  },
+  {
+    "name": "market-research-skill",
+    "description": "Runs structured supplier and market research, capability comparison, pricing observations, and risk checks. Use for market scans, longlists, and sourcing research.",
+    "package": "packages/market-research-skill.zip",
+    "source": "agent-skills/market-research-skill/SKILL.md"
+  },
+  {
+    "name": "rfp-drafting-skill",
+    "description": "Drafts and challenges RFx content for clarity, fairness, measurability, evaluation alignment, and commercial risk. Use for RFP, RFB, RFQ, RFI, or SOW drafting.",
+    "package": "packages/rfp-drafting-skill.zip",
+    "source": "agent-skills/rfp-drafting-skill/SKILL.md"
+  },
+  {
+    "name": "pricing-model-review-skill",
+    "description": "Reviews pricing models for cost drivers, hidden fees, comparability, renewal exposure, TCO, and exit risk. Use for commercial envelopes and supplier pricing.",
+    "package": "packages/pricing-model-review-skill.zip",
+    "source": "agent-skills/pricing-model-review-skill/SKILL.md"
+  },
+  {
+    "name": "sla-review-skill",
+    "description": "Reviews SLAs and KPIs for clear metrics, measurement, reporting, remedies, escalation, and business criticality. Use before award or during contract management.",
+    "package": "packages/sla-review-skill.zip",
+    "source": "agent-skills/sla-review-skill/SKILL.md"
+  },
+  {
+    "name": "contract-risk-review-skill",
+    "description": "Maps procurement and commercial risks in contract terms and flags legal escalation points. Use for first-pass contract review, renewals, and negotiations.",
+    "package": "packages/contract-risk-review-skill.zip",
+    "source": "agent-skills/contract-risk-review-skill/SKILL.md"
+  },
+  {
+    "name": "negotiation-prep-skill",
+    "description": "Builds supplier negotiation briefs with asks, leverage, concessions, pushback, fallbacks, and approvals. Use before pricing, renewal, or contract negotiations.",
+    "package": "packages/negotiation-prep-skill.zip",
+    "source": "agent-skills/negotiation-prep-skill/SKILL.md"
+  },
+  {
+    "name": "supplier-qbr-skill",
+    "description": "Prepares supplier QBRs by analyzing obligations, SLA performance, issues, actions, spend, risks, and priorities. Use for vendor performance reviews.",
+    "package": "packages/supplier-qbr-skill.zip",
+    "source": "agent-skills/supplier-qbr-skill/SKILL.md"
+  },
+  {
+    "name": "spend-analysis-skill",
+    "description": "Cleans and analyzes spend data to find supplier concentration, overlaps, anomalies, contract gaps, renewal risks, and validated sourcing opportunities.",
+    "package": "packages/spend-analysis-skill.zip",
+    "source": "agent-skills/spend-analysis-skill/SKILL.md"
+  }
+]
